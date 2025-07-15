@@ -8,6 +8,7 @@ import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
 import com.example.usermanagementservice.model.UserDetailsDto;
 import com.example.usermanagementservice.model.UserDto;
+import com.example.usermanagementservice.model.UserSoiDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,5 +82,58 @@ public class UserMapperTest {
         assertThat(result).isNotNull();
         assertThat(result.getSystemUserId()).isEqualTo(user.getSystemUserId());
         assertThat(result.getUserDetails()).isEqualTo(userDetailsDto);
+    }
+
+    @Test
+    @DisplayName("userToDto - null mapps correctly")
+    void userToDto_null() {
+        //Given
+
+        //When
+        UserDto result = mapper.userToDto(null);
+
+        //Then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("userToUserSoi - mapps correctly")
+    void userToUserSoi() {
+        //Given
+        UserDetails userDetails = UserDetails.builder()
+                .firstName("firstName")
+                .middleName("middleName")
+                .lastName("lastName")
+                .primaryEmail("hello@test.co.uk")
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .systemUserId(UUID.randomUUID())
+                .userDetails(Set.of(userDetails))
+                .build();
+
+        //When
+        UserSoiDto result = mapper.userToUserSoi(user);
+
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getSystemUserId()).isEqualTo(user.getSystemUserId());
+        assertThat(result.getFirstName()).isEqualTo(userDetails.getFirstName());
+        assertThat(result.getMiddleName()).isEqualTo(userDetails.getMiddleName());
+        assertThat(result.getLastname()).isEqualTo(userDetails.getLastName());
+        assertThat(result.getPrimaryEmail()).isEqualTo(userDetails.getPrimaryEmail());
+    }
+
+    @Test
+    @DisplayName("userToUserSoi - null mapps correctly")
+    void userToUserSoi_null() {
+        //Given
+
+        //When
+        UserSoiDto result = mapper.userToUserSoi(null);
+
+        //Then
+        assertThat(result).isNull();
     }
 }
