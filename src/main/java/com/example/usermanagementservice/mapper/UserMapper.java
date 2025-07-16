@@ -1,6 +1,7 @@
 package com.example.usermanagementservice.mapper;
 
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
+import com.example.usermanagementservice.client.request.KeycloakCreateUserRequest;
 import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
 import com.example.usermanagementservice.model.UserDto;
@@ -34,6 +35,14 @@ public interface UserMapper {
     @Mapping(target = "modifiedBy", ignore = true)
     @Mapping(target = "modifiedDate", ignore = true)
     User requestToUser(CreateUserRequest request);
+
+    /**
+     * Maps a create user request to a keycloak create user request.
+     *
+     * @param request the create user request to be mapped.
+     * @return the create user request for keycloak.
+     */
+    KeycloakCreateUserRequest requestToKeycloak(CreateUserRequest request);
 
     /**
      * map a request to an entity.
