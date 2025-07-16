@@ -12,10 +12,18 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     /**
-     * Returns the User entity associated to a unique MAPPS User ID if one exists.
+     * Returns the User entity associated to a unique system user id if one exists.
      *
      * @param systemUserId the unique User ID of the user.
      * @return the optional instance of the User Entity
      */
     Optional<User> findBySystemUserId(UUID systemUserId);
+
+    /**
+     * Returns if a user with a system user id exists/
+     *
+     * @param systemUserId the unique system user id of a user.
+     * @return if the system user id exists.
+     */
+    boolean existsBySystemUserId(UUID systemUserId);
 }

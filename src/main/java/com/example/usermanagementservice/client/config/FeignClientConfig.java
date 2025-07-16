@@ -1,15 +1,10 @@
-package com.example.usermanagementservice.client;
+package com.example.usermanagementservice.client.config;
 
-import feign.Logger;
-import feign.RequestInterceptor;
+import feign.Logger.Level;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.util.Optional;
 
 /**
  * This Configuration class can be used for Spring Feign Clients interfaces for configuration.
@@ -19,13 +14,8 @@ import java.util.Optional;
 public class FeignClientConfig {
 
     @Value("${feign.log-level:HEADERS}")
-    private final Logger.Level level;
+    private final Level level;
 
     @Bean
-    RequestInterceptor feignClientInterceptor() {
-        return template -> {
-            Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                    .filter(ServletRequestAttributes.class)
-        }
-    }
+    Level feignLoggerLevel() {return level;}
 }
