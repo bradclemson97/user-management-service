@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 import java.time.OffsetDateTime;
 
 /**
- * Model of SourceOfInformation for auditing.
+ * Model of SourceOfInformation for auditing. Used in JpaAuditEntity.
  */
 @Data
 @Builder

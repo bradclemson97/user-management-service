@@ -8,7 +8,7 @@ import lombok.extern.jackson.Jacksonized;
 import java.util.UUID;
 
 /**
- * A model representing the information of a user.
+ * A model representing the information of a user. Used in UserAuditSoi for JpaAuditEntity.
  */
 @Data
 @Builder
