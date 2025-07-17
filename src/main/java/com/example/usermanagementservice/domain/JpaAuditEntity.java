@@ -16,7 +16,9 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
- * Parent class of all Entities in Domain.
+ * Parent class of all Entities in Domain. When this class is extended by a domain class,
+ * creating or modifying a record in that domain sees the user's systemUserId
+ * and date time of action captured in the respective created/modified db fields.
  */
 @Getter
 @Setter
