@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>spring-mapstruct-lombok-data</artifactId>
+    <artifactId>user-management-service</artifactId>
     <version>1.0.0</version>
 
     <properties>
