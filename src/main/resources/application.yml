@@ -16,7 +16,7 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        default_schema: ${DB_SCHEMA:user-management}
+        default_schema: ${DB_SCHEMA:user_management}
   flyway:
     enabled: true
     schemas: user_management
