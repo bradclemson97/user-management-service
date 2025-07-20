@@ -2,7 +2,9 @@ package com.example.usermanagementservice.service;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import com.example.usermanagementservice.client.AcmClient;
 import com.example.usermanagementservice.client.KeycloakManagerClient;
+import com.example.usermanagementservice.client.request.AcmCreateUserRequest;
 import com.example.usermanagementservice.client.request.KeycloakCreateUserRequest;
 import com.example.usermanagementservice.client.response.KeycloakCreateUserResponse;
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
@@ -41,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final UserDetailsRepository userDetailsRepository;
     private final UserMapper userMapper;
     private final KeycloakManagerClient keycloakManagerClient;
+    private final AcmClient acmClient;
 
     private static final String KEYWORD_DELIMITER = " ";
 
@@ -68,6 +71,19 @@ public class UserServiceImpl implements UserService {
             KeycloakCreateUserRequest keycloakRequest = userMapper.requestToKeycloak(request);
             KeycloakCreateUserResponse keycloakResponse = keycloakManagerClient.createUser(keycloakRequest);
             password = keycloakResponse.getPassword();
+
+            // Try to create user in ACM, if fails (should never happen), and is Keycloak user, remove it
+        try {
+            AcmCreateUserRequest acmRequest = AcmCreateUserRequest.builder()
+                    .systemUserId(request.getSystemUserId())
+                    .build();
+            acmClient.createUser(acmRequest);
+        } catch (Exception exception) {
+            log.error("Problem creating new user {} in ACM, attempting to rollback user in Keycloak", systemUserId);
+            keycloakManagerClient.rollbackCreateUser(request.getEmail());
+            log.info("Successfully rolled back user in Keycloak for {}", systemUserId);
+            throw exception;
+        }
 
         return CreateUserResponse.builder()
                     .systemUserId(systemUserId)
