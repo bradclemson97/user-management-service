@@ -8,11 +8,13 @@ import com.example.usermanagementservice.client.response.KeycloakCreateUserRespo
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.User;
+import com.example.usermanagementservice.domain.UserDetails;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
 import com.example.usermanagementservice.exception.ConflictException;
 import com.example.usermanagementservice.mapper.UserMapper;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
+import com.example.usermanagementservice.repository.UserDetailsRepository;
 import com.example.usermanagementservice.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Path;
@@ -25,10 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Implementation of User Service.
@@ -39,6 +38,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserDetailsRepository userDetailsRepository;
     private final UserMapper userMapper;
     private final KeycloakManagerClient keycloakManagerClient;
 
@@ -87,6 +87,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUser(UUID systemUserId) {
         User user = findUser(systemUserId);
+        return userMapper.userToDto(user);
+    }
+
+    @Override
+    public UserDetails findUserDetailsByPrimaryEmail(String primaryEmail) {
+        return userDetailsRepository.findByPrimaryEmail(primaryEmail)
+                .orElseThrow(() -> {
+                    log.info("User Details not found for primaryEmail {}", primaryEmail);
+                    return new EntityNotFoundException("User Details not found for primaryEmail");
+                });
+    }
+
+    @Override
+    public UserDto getUserByPrimaryEmail(String primaryEmail) {
+        User user = findUserDetailsByPrimaryEmail(primaryEmail).getUser();
         return userMapper.userToDto(user);
     }
 

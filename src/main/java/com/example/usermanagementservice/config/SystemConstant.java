@@ -13,4 +13,5 @@ public class SystemConstant {
     public static final String API_USER = "/user";
     public static final String API_CURRENT = "/current";
     public static final String API_SOI = "/soi";
+    public static final String API_EMAIL = "/email";
 }
