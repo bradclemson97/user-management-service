@@ -1,28 +1,49 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/userdb
-    username: postgres
-    password: password
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
-
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 logging:
   level:
     org.springframework: INFO
     com.example.usermanagementservice: DEBUG
+
+spring:
+  application:
+    name: @project.name@
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${DB_SCHEMA:user-management}
+  flyway:
+    enabled: true
+    schemas: user_management
+    placeholders:
+      system-admin-username: ${SYSTEM_ADMIN_USERNAME:systemadmin@email.com}
+      system-admin-firstname: ${SYSTEM_ADMIN_FIRSTNAME:system}
+      system-admin-lastname: ${SYSTEM_ADMIN_LASTNAME:admin}
+      system-admin-email: ${SYSTEM_ADMIN_EMAIL:systemadmin@email.com}
+      system-admin-systemuser-id: ${SYSTEM_ADMIN_SYSTEMUSER-ID:9a908a6d-77hq-38sj-28ka-9aa90tg9h56f}
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/userdb
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+application:
+  name: "@project.name"
+  description: "@project.description@"
+  version: "@project.version"
+  slug: "@project.artifactId"
+  env: ${ENVIRONMENT:local}
+
+app:
+  user:
+    search:
+      page:
+        size: ${USER_SEARCH_PAGE_SIZE:25}
 
 cache:
   expire-after: ${CACHE_EXPIRE_AFTER:60}
