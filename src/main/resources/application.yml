@@ -24,7 +24,14 @@ logging:
     org.springframework: INFO
     com.example.usermanagementservice: DEBUG
 
+cache:
+  expire-after: ${CACHE_EXPIRE_AFTER:60}
+  expiry-units: ${CACHE_EXPIRY_UNITS:MINUTES}
+  max: ${CACHE_MAX_SIZE:1000}
+
 clients:
   clients:
     keycloak-manager:
       base-url: ${KEYCLOAK_MANAGER_URL:http://localhost:8210}
+    acm:
+      base-url: ${ACM_URL:http://localhost:8130}
