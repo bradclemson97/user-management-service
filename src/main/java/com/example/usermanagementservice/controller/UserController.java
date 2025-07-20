@@ -61,6 +61,13 @@ public interface UserController {
             description = "The user's unique reference")
             @PathVariable UUID systemUserId);
 
+    @Operation(summary = "Get user by primary email", description = "Get user information for the provided primaryEmail")
+    @GetMapping(API_EMAIL + "/" + "{primaryEmailId}")
+    UserDto getUserByPrimaryEmail(
+            @Parameter(example = "test@test.com",
+                    description = "The user's primary email")
+            @PathVariable String primaryEmail);
+
     @Operation(summary = "Get current user",
             description = "Get current user information via session token claims")
     @GetMapping(API_CURRENT)

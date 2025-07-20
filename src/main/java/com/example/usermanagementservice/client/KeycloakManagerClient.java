@@ -27,6 +27,6 @@ public interface KeycloakManagerClient {
     /**
      * Rollback a new User creation in Keycloak.
      */
-    @DeleteMapping("v1/user/rollback/{systemUserId}")
-    void rollbackCreateUser(@PathVariable String systemUserId);
+    @DeleteMapping("v1/user/rollback/{primaryEmail}")
+    void rollbackCreateUser(@PathVariable String primaryEmail);
 }
