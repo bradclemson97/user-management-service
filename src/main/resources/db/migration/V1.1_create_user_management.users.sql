@@ -4,6 +4,7 @@ CREATE TABLE user_management.users (
   usr_id BIGSERIAL NOT NULL,
   system_user_id UUID NOT NULL UNIQUE,
   locked_user_ind varchar(10) NOT NULL,
+  sys_period tstzrange NOT NULL DEFAULT tstzrange(current_timestamp, null),
   created_by UUID NOT NULL,
   created_date timestamp with time zone NOT NULL,
   modified_by UUID NOT NULL,
