@@ -11,6 +11,7 @@ CREATE TABLE user_management.user_details (
   primary_email varchar(1000) NOT NULL,
   known_from_date timestamp with time zone NOT NULL,
   known_to_date timestamp with time zone NULL,
+  sys_period tstzrange NOT NULL DEFAULT tstzrange(current_timestamp, null),
   created_by UUID NOT NULL,
   created_date timestamp with time zone NOT NULL,
   modified_by UUID NOT NULL,
