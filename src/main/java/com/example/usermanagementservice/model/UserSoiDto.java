@@ -19,6 +19,6 @@ public class UserSoiDto {
     private UUID systemUserId;
     private String firstName;
     private String middleName;
-    private String lastname;
+    private String lastName;
     private String primaryEmail;
 }
