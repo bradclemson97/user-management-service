@@ -121,7 +121,7 @@ public class UserMapperTest {
         assertThat(result.getSystemUserId()).isEqualTo(user.getSystemUserId());
         assertThat(result.getFirstName()).isEqualTo(userDetails.getFirstName());
         assertThat(result.getMiddleName()).isEqualTo(userDetails.getMiddleName());
-        assertThat(result.getLastname()).isEqualTo(userDetails.getLastName());
+        assertThat(result.getLastName()).isEqualTo(userDetails.getLastName());
         assertThat(result.getPrimaryEmail()).isEqualTo(userDetails.getPrimaryEmail());
     }
 
