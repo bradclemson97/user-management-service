@@ -66,7 +66,7 @@ public interface UserController {
     UserDto getUserByPrimaryEmail(
             @Parameter(example = "test@test.com",
                     description = "The user's primary email")
-            @PathVariable String primaryEmail);
+            @PathVariable String primaryEmailId);
 
     @Operation(summary = "Get current user",
             description = "Get current user information via session token claims")

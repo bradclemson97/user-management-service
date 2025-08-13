@@ -8,7 +8,7 @@ logging:
 
 spring:
   application:
-    name: @project.name@
+    name: user-management-service
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
@@ -31,6 +31,9 @@ spring:
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
+  cloud:
+    config:
+      enabled: false
 
 application:
   name: "@project.name"
