@@ -48,16 +48,16 @@ public class UserControllerImpl implements UserController {
      * getUserByPrimaryEmail to be used by keycloak-manager to
      * retrieve account details for a user.
      *
-     * @param primaryEmail the primary email of the user
+     * @param primaryEmailId the primary email of the user
      * @return user
      */
     @Override
-    public UserDto getUserByPrimaryEmail(String primaryEmail) {
+    public UserDto getUserByPrimaryEmail(String primaryEmailId) {
         log.info("Attempting to retrieve the user with email {}",
-                primaryEmail);
-        UserDto user = userService.getUserByPrimaryEmail(primaryEmail);
+                primaryEmailId);
+        UserDto user = userService.getUserByPrimaryEmail(primaryEmailId);
         log.info("Successfully retrieved the user with email {}",
-                primaryEmail);
+                primaryEmailId);
         return user;
     }
 
