@@ -2,7 +2,7 @@
 
 This service provides functionality for creating, updating and retrieving system users and their details. 
 When creating a new user, the user's credentials are generated using Keycloak (Open Source Identity and Access Management) 
-by calling a seperate [<keycloak-manager>](<https://github.com/bradclemson97/keycloak-manager>) service. The user is also created in a seperate [<access-control-manager>](<https://github.com/bradclemson97/keycloak-manager>) service where the user can be 
+by calling a seperate [keycloak-manager](https://github.com/bradclemson97/keycloak-manager) service. The user is also created in a seperate [access-control-manager](https://github.com/bradclemson97/keycloak-manager) service where the user can be 
 assigned roles. 
 
 A user can have a number of user detail records but only one will be active at any time. 
