@@ -3,6 +3,13 @@
 ## 1. Overview
 The **User Management Service** is a core microservice built with **Spring Boot 3.2.5**. It serves as the primary entry point for managing user identity, profile details, and coordinating access control across the application ecosystem.
 
+This service is part of a distributed system and interacts directly with the following microservices:
+
+* **Access Control Manager (ACM)**: Manages roles, permissions, and capabilities.
+    > Repository: [https://github.com/bradclemson97/access-control-manager](https://github.com/bradclemson97/access-control-manager)
+* **Keycloak Manager**: Handles identity provider integration and credential storage.
+    > Repository: [https://github.com/bradclemson97/keycloak-manager](https://github.com/bradclemson97/keycloak-manager)
+
 The service manages two distinct responsibilities:
 1.  **Identity Orchestration**: Coordinating user creation between local storage, **Keycloak** (for authentication), and the **Access Control Manager** (for permissions).
 2.  **Profile Management**: Maintaining detailed user information such as names and contact details.
