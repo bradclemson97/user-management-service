@@ -1,6 +1,7 @@
 package com.example.usermanagementservice.service;
 
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
+import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
@@ -79,4 +80,20 @@ public interface UserService {
      */
     Page<UserDto> search(String name, UserSearchSort sortBy, Sort.Direction sortDirection,
                          int page, int size);
+
+    /**
+     * Update user profile by creating a new temporal UserDetails record and closing the current one.
+     *
+     * @param systemUserId the systemUserId of the user to update
+     * @param request the fields to update
+     * @return the updated user.
+     */
+    UserDto updateUser(UUID systemUserId, UpdateUserRequest request);
+
+    /**
+     * Deactivate a user by setting active = NO and closing their current UserDetails record.
+     *
+     * @param systemUserId the systemUserId of the user to deactivate
+     */
+    void deactivateUser(UUID systemUserId);
 }

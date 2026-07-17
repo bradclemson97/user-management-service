@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import static org.mapstruct.NullValueMappingStrategy.RETURN_DEFAULT;
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
-@Mapper(componentModel = "string",
+@Mapper(componentModel = "spring",
 nullValuePropertyMappingStrategy = IGNORE, nullValueIterableMappingStrategy = RETURN_DEFAULT)
 public interface UserDetailsMapper {
 

@@ -1,6 +1,7 @@
 package com.example.usermanagementservice.controller;
 
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
+import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
 import com.example.usermanagementservice.model.UserDto;
@@ -79,6 +80,21 @@ public class UserControllerImpl implements UserController {
         log.info("Successfully retrieved the SOI for user {}",
                 systemUserId);
         return user;
+    }
+
+    @Override
+    public UserDto updateUser(UUID systemUserId, UpdateUserRequest request) {
+        log.info("Attempting to update user {}", systemUserId);
+        UserDto updated = userService.updateUser(systemUserId, request);
+        log.info("Successfully updated user {}", systemUserId);
+        return updated;
+    }
+
+    @Override
+    public void deactivateUser(UUID systemUserId) {
+        log.info("Attempting to deactivate user {}", systemUserId);
+        userService.deactivateUser(systemUserId);
+        log.info("Successfully deactivated user {}", systemUserId);
     }
 
     @Override
