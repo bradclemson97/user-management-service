@@ -8,17 +8,19 @@ import com.example.usermanagementservice.client.request.AcmCreateUserRequest;
 import com.example.usermanagementservice.client.request.KeycloakCreateUserRequest;
 import com.example.usermanagementservice.client.response.KeycloakCreateUserResponse;
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
+import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
+import com.example.usermanagementservice.domain.enums.YesNo;
 import com.example.usermanagementservice.exception.ConflictException;
+import com.example.usermanagementservice.exception.NotFoundException;
 import com.example.usermanagementservice.mapper.UserMapper;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
 import com.example.usermanagementservice.repository.UserDetailsRepository;
 import com.example.usermanagementservice.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Path;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
@@ -67,10 +70,9 @@ public class UserServiceImpl implements UserService {
             UUID systemUserId = user.getSystemUserId();
             log.info("User {} saved in User Manager Transactionaly", user);
 
-            String password = null;
             KeycloakCreateUserRequest keycloakRequest = userMapper.requestToKeycloak(request);
             KeycloakCreateUserResponse keycloakResponse = keycloakManagerClient.createUser(keycloakRequest);
-            password = keycloakResponse.getPassword();
+            String password = keycloakResponse.getPassword();
 
             // Try to create user in ACM, if fails (should never happen), and is Keycloak user, remove it
         try {
@@ -96,7 +98,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findBySystemUserId(systemUserId)
                 .orElseThrow(() -> {
                     log.info("User not found for systemUserId {}", systemUserId);
-                    return new EntityNotFoundException("User not found for systemUserId");
+                    return new NotFoundException("User not found for systemUserId " + systemUserId);
                 });
     }
 
@@ -111,7 +113,7 @@ public class UserServiceImpl implements UserService {
         return userDetailsRepository.findByPrimaryEmail(primaryEmail)
                 .orElseThrow(() -> {
                     log.info("User Details not found for primaryEmail {}", primaryEmail);
-                    return new EntityNotFoundException("User Details not found for primaryEmail");
+                    return new NotFoundException("User Details not found for primaryEmail " + primaryEmail);
                 });
     }
 
@@ -173,5 +175,39 @@ public class UserServiceImpl implements UserService {
           return criteriaBuilder.like(criteriaBuilder.lower(userDetails.get(field)),
                   criteriaBuilder.lower(criteriaBuilder.literal("%" + param + "%")));
         };
+    }
+
+    @Override
+    @Transactional
+    public UserDto updateUser(UUID systemUserId, UpdateUserRequest request) {
+        User user = findUser(systemUserId);
+        UserDetails currentDetails = user.getCurrentUserDetails();
+
+        if (currentDetails != null) {
+            currentDetails.setKnownToDate(OffsetDateTime.now());
+        }
+
+        UserDetails newDetails = userMapper.updateRequestToUserDetails(request);
+        newDetails.setUser(user);
+        user.getUserDetails().add(newDetails);
+
+        user = userRepository.save(user);
+        log.info("Updated user details for systemUserId {}", systemUserId);
+        return userMapper.userToDto(user);
+    }
+
+    @Override
+    @Transactional
+    public void deactivateUser(UUID systemUserId) {
+        User user = findUser(systemUserId);
+        user.setActive(YesNo.NO);
+
+        UserDetails currentDetails = user.getCurrentUserDetails();
+        if (currentDetails != null) {
+            currentDetails.setKnownToDate(OffsetDateTime.now());
+        }
+
+        userRepository.save(user);
+        log.info("Deactivated user {}", systemUserId);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.usermanagementservice.controller;
 
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
+import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
 import com.example.usermanagementservice.exception.response.ApiError;
@@ -80,6 +81,24 @@ public interface UserController {
             description = "Get user SOI fir the provided systemUserId")
     @GetMapping(API_SOI + "/{systemUserId}")
     UserSoiDto getUserSoi(
+            @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
+                    description = "The user's unique reference")
+            @PathVariable UUID systemUserId);
+
+    @Operation(summary = "Update user", description = "Update user profile details — creates a new temporal UserDetails record")
+    @PutMapping("{systemUserId}")
+    @ApiResponse(responseCode = "200", description = "User updated successfully")
+    UserDto updateUser(
+            @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
+                    description = "The user's unique reference")
+            @PathVariable UUID systemUserId,
+            @RequestBody @Valid UpdateUserRequest request);
+
+    @Operation(summary = "Deactivate user", description = "Deactivate a user account")
+    @DeleteMapping("{systemUserId}" + API_DEACTIVATE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode = "204", description = "User deactivated successfully")
+    void deactivateUser(
             @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
                     description = "The user's unique reference")
             @PathVariable UUID systemUserId);

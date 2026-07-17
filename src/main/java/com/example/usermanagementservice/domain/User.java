@@ -45,6 +45,11 @@ public class User extends JpaAuditEntity {
     @Builder.Default
     private YesNo locked = NO;
 
+    @Column(name = "active_ind", nullable = false)
+    @Enumerated(STRING)
+    @Builder.Default
+    private YesNo active = YesNo.YES;
+
     @OneToMany(mappedBy = "user", cascade = ALL, fetch = EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

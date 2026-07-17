@@ -1,5 +1,6 @@
 package com.example.usermanagementservice.model;
 
+import com.example.usermanagementservice.domain.enums.YesNo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,6 @@ import java.util.UUID;
 public class UserDto {
 
     private UUID systemUserId;
+    private YesNo active;
     private UserDetailsDto userDetails;
 }

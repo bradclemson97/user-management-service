@@ -35,6 +35,6 @@ public interface AcmClient {
      * @return the access control information for a user.
      */
     @Cacheable(value = "acm_user_cache")
-    @GetMapping("/v1/users/{systemUserId")
+    @GetMapping("/v1/users/{systemUserId}")
     AcmUserDto getUser(@PathVariable String systemUserId);
 }

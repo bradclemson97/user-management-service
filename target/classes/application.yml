@@ -1,0 +1,61 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    org.springframework: INFO
+    com.example.usermanagementservice: DEBUG
+
+spring:
+  application:
+    name: user-management-service
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${DB_SCHEMA:user_management}
+  flyway:
+    enabled: true
+    schemas: user_management
+    placeholders:
+      system-admin-username: ${SYSTEM_ADMIN_USERNAME:systemadmin@email.com}
+      system-admin-firstname: ${SYSTEM_ADMIN_FIRSTNAME:system}
+      system-admin-lastname: ${SYSTEM_ADMIN_LASTNAME:admin}
+      system-admin-email: ${SYSTEM_ADMIN_EMAIL:systemadmin@email.com}
+      system-admin-systemuser-id: ${SYSTEM_ADMIN_SYSTEMUSER-ID:9a908a6d-77hq-38sj-28ka-9aa90tg9h56f}
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/userdb
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  cloud:
+    config:
+      enabled: false
+
+application:
+  name: "@project.name"
+  description: "Parent pom providing dependency and plugin management for applications built with Maven"
+  version: "@project.version"
+  slug: "@project.artifactId"
+  env: ${ENVIRONMENT:local}
+
+app:
+  user:
+    search:
+      page:
+        size: ${USER_SEARCH_PAGE_SIZE:25}
+
+cache:
+  expire-after: ${CACHE_EXPIRE_AFTER:60}
+  expiry-units: ${CACHE_EXPIRY_UNITS:MINUTES}
+  max: ${CACHE_MAX_SIZE:1000}
+
+clients:
+  clients:
+    keycloak-manager:
+      base-url: ${KEYCLOAK_MANAGER_URL:http://localhost:8210}
+    acm:
+      base-url: ${ACM_URL:http://localhost:8130}

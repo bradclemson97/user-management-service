@@ -1,6 +1,7 @@
 package com.example.usermanagementservice.mapper;
 
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
+import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.client.request.KeycloakCreateUserRequest;
 import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
@@ -8,6 +9,7 @@ import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +20,7 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
 @Mapper(componentModel = "spring",
 nullValuePropertyMappingStrategy = IGNORE, nullValueIterableMappingStrategy = RETURN_DEFAULT,
+unmappedTargetPolicy = ReportingPolicy.IGNORE,
 uses = {UserDetailsMapper.class})
 public interface UserMapper {
 
@@ -30,10 +33,7 @@ public interface UserMapper {
     @Mapping(source = "request", target = "userDetails")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "locked", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "modifiedBy", ignore = true)
-    @Mapping(target = "modifiedDate", ignore = true)
+    @Mapping(target = "active", ignore = true)
     User requestToUser(CreateUserRequest request);
 
     /**
@@ -57,11 +57,20 @@ public interface UserMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "knownFromDate", ignore = true)
     @Mapping(target = "knownToDate", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "modifiedBy", ignore = true)
-    @Mapping(target = "modifiedDate", ignore = true)
     UserDetails requestToUserDetails(CreateUserRequest request);
+
+    /**
+     * map an update request to a UserDetails entity (creates a new temporal record).
+     *
+     * @param request UpdateUserRequest
+     * @return UserDetails
+     */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userDetailId", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "knownFromDate", ignore = true)
+    @Mapping(target = "knownToDate", ignore = true)
+    UserDetails updateRequestToUserDetails(UpdateUserRequest request);
 
     /**
      * map a user to a user dto

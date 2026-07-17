@@ -10,11 +10,11 @@ import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
 import com.example.usermanagementservice.exception.ConflictException;
+import com.example.usermanagementservice.exception.NotFoundException;
 import com.example.usermanagementservice.mapper.UserMapper;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.repository.UserDetailsRepository;
 import com.example.usermanagementservice.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -101,7 +101,7 @@ class UserServiceTest {
     @Test
     void getUser_notFound_throwsException() {
         when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> userService.getUser(userId));
+        assertThrows(NotFoundException.class, () -> userService.getUser(userId));
     }
 
     @Test
@@ -125,7 +125,7 @@ class UserServiceTest {
         when(userDetailsRepository.findByPrimaryEmail("notfound@example.com"))
                 .thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(NotFoundException.class,
                 () -> userService.getUserByPrimaryEmail("notfound@example.com"));
     }
 
