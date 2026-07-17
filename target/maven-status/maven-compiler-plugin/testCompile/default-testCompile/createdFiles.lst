@@ -1,0 +1,3 @@
+com/example/usermanagementservice/mapper/UserMapperTest.class
+com/example/usermanagementservice/controller/UserControllerTest.class
+com/example/usermanagementservice/service/UserServiceTest.class
