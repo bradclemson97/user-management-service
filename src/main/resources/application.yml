@@ -21,11 +21,11 @@ spring:
     enabled: true
     schemas: user_management
     placeholders:
-      system-admin-username: ${SYSTEM_ADMIN_USERNAME:systemadmin@email.com}
-      system-admin-firstname: ${SYSTEM_ADMIN_FIRSTNAME:system}
-      system-admin-lastname: ${SYSTEM_ADMIN_LASTNAME:admin}
-      system-admin-email: ${SYSTEM_ADMIN_EMAIL:systemadmin@email.com}
-      system-admin-systemuser-id: ${SYSTEM_ADMIN_SYSTEMUSER-ID:9a908a6d-77hq-38sj-28ka-9aa90tg9h56f}
+      system-admin-username: ${SYSTEM_ADMIN_USERNAME:superuser@system.local}
+      system-admin-firstname: ${SYSTEM_ADMIN_FIRSTNAME:Super}
+      system-admin-lastname: ${SYSTEM_ADMIN_LASTNAME:User}
+      system-admin-email: ${SYSTEM_ADMIN_EMAIL:superuser@system.local}
+      system-admin-systemuser-id: ${SYSTEM_ADMIN_SYSTEMUSER_ID:a0000000-0000-0000-0000-000000000001}
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/userdb
     username: postgres
@@ -59,3 +59,8 @@ clients:
       base-url: ${KEYCLOAK_MANAGER_URL:http://localhost:8210}
     acm:
       base-url: ${ACM_URL:http://localhost:8130}
+
+access-control:
+  security:
+    manager-url: ${ACM_URL:http://localhost:8130}
+    system-user-id-claim: sub

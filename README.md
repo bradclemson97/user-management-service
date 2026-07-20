@@ -80,4 +80,92 @@ User Management Entity Relationship
 User Creation Process Visualisation 
 <img width="7175" height="4700" alt="User Creation Process Visualization" src="https://github.com/user-attachments/assets/3c19854d-bfff-41f6-b85e-6459ca095d5d" />
 
+## 9. Manual Setup Steps
 
+These steps must be completed once after the services are first started. They cannot be automated because they depend on runtime state in Keycloak and external configuration.
+
+### 9.1 Bootstrap the Superuser in Keycloak
+
+The Flyway migrations automatically create the superuser record in both the `user_management` and `access_control` databases with the fixed UUID `a0000000-0000-0000-0000-000000000001`. However, the matching Keycloak account must be created manually.
+
+**Option A — via the Keycloak Manager API (recommended)**
+
+Call the Keycloak Manager's create-user endpoint, passing the pre-assigned system user ID so that all three systems share the same identity:
+
+```
+POST http://localhost:8210/v1/user
+Content-Type: application/json
+
+{
+  "systemUserId": "a0000000-0000-0000-0000-000000000001",
+  "email": "superuser@system.local",
+  "firstName": "Super",
+  "lastName": "User"
+}
+```
+
+The response contains a generated temporary passphrase — save this, it is the superuser's initial login credential.
+
+**Option B — via the Keycloak Admin Console**
+
+1. Navigate to `http://localhost:9000` and sign in as the Keycloak admin.
+2. Select the correct realm (e.g. `system`).
+3. Go to **Users** > **Add user**.
+4. Set **Username** to `superuser@system.local`, **Email** to `superuser@system.local`, **First name** to `Super`, **Last name** to `User`.
+5. Under the **Attributes** tab, add a custom attribute `systemUserId` with value `a0000000-0000-0000-0000-000000000001`. This must match the claim the security library reads (configured via `access-control.security.system-user-id-claim`).
+6. Under the **Credentials** tab, set a temporary password and note it down.
+
+### 9.2 Register the UI Client in Keycloak
+
+The `user-management-ui` requires an OIDC client registered in Keycloak before it can authenticate users.
+
+1. In the Keycloak Admin Console, go to **Clients** > **Create client**.
+2. Set **Client ID** to `user-management-ui`.
+3. Enable **Client authentication** (confidential client).
+4. Under **Valid redirect URIs**, add `http://localhost:3000/auth/callback`.
+5. Under **Valid post logout redirect URIs**, add `http://localhost:3000`.
+6. Under **Web origins**, add `http://localhost:3000`.
+7. Save, then go to the **Credentials** tab and copy the **Client secret**.
+
+### 9.3 Configure the UI Environment
+
+In the `user-management-ui` repository, create a `.env` file from the provided example:
+
+```bash
+cp .env.example .env
+```
+
+Then open `.env` and fill in the values:
+
+```
+PORT=3000
+SESSION_SECRET=<generate a long random string>
+KEYCLOAK_BASE_URL=http://localhost:9000
+KEYCLOAK_REALM=system
+KEYCLOAK_CLIENT_ID=user-management-ui
+KEYCLOAK_CLIENT_SECRET=<paste the client secret from step 9.2>
+APP_BASE_URL=http://localhost:3000
+UMS_BASE_URL=http://localhost:8080
+```
+
+### 9.4 Start the UI
+
+```bash
+cd /path/to/user-management-ui
+npm install
+npm run dev       # development (hot-reload)
+# or
+npm run build && npm start   # production
+```
+
+The UI will be available at `http://localhost:3000`.
+
+### 9.5 First Login as Superuser
+
+1. Open `http://localhost:3000` in a browser.
+2. You will be redirected to the Keycloak login page.
+3. Sign in with `superuser@system.local` and the temporary passphrase obtained in step 9.1.
+4. Keycloak will prompt you to set a permanent password on first login.
+5. After authentication you will be redirected back to the user list.
+
+The superuser has all roles and capabilities pre-assigned via the ACM bootstrap migration, so every protected endpoint in UMS and ACM is accessible immediately after login.

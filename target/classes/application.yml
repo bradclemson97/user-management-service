@@ -59,3 +59,8 @@ clients:
       base-url: ${KEYCLOAK_MANAGER_URL:http://localhost:8210}
     acm:
       base-url: ${ACM_URL:http://localhost:8130}
+
+access-control:
+  security:
+    manager-url: ${ACM_URL:http://localhost:8130}
+    system-user-id-claim: sub
