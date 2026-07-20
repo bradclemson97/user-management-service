@@ -100,6 +100,13 @@
             <version>6.2.2</version>
         </dependency>
 
+        <!-- Security library: RBAC via Access Control Manager -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>security-library</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Optional: Spring Security Test -->
         <dependency>
             <groupId>org.springframework.security</groupId>

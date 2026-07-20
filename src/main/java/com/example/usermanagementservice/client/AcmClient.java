@@ -23,7 +23,7 @@ public interface AcmClient {
      *
      * @return the systemUserId of the new User
      */
-    @PostMapping("v1/users")
+    @PostMapping("v1/user")
     AcmCreateUserResponse createUser(@RequestBody AcmCreateUserRequest request);
 
     /**
@@ -35,6 +35,6 @@ public interface AcmClient {
      * @return the access control information for a user.
      */
     @Cacheable(value = "acm_user_cache")
-    @GetMapping("/v1/users/{systemUserId}")
+    @GetMapping("/v1/user/{systemUserId}")
     AcmUserDto getUser(@PathVariable String systemUserId);
 }

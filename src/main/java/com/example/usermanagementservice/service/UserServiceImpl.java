@@ -171,7 +171,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return (root, query, criteriaBuilder) -> {
-          Path<Set<User>> userDetails = root.get("UserDetails");
+          Path<Set<User>> userDetails = root.get("userDetails");
           return criteriaBuilder.like(criteriaBuilder.lower(userDetails.get(field)),
                   criteriaBuilder.lower(criteriaBuilder.literal("%" + param + "%")));
         };

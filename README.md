@@ -80,4 +80,5 @@ User Management Entity Relationship
 User Creation Process Visualisation 
 <img width="7175" height="4700" alt="User Creation Process Visualization" src="https://github.com/user-attachments/assets/3c19854d-bfff-41f6-b85e-6459ca095d5d" />
 
-
+TO DO: The Keycloak account for superuser@system.local still needs to be created — either via the Keycloak admin console (using the realm) or by calling the Keycloak Manager's POST      
+/v1/user with systemUserId = a0000000-0000-0000-0000-000000000001. The generated passphrase from that call is the initial credential.

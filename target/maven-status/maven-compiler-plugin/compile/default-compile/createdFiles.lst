@@ -41,6 +41,7 @@ com/example/usermanagementservice/exception/GlobalExceptionHandler.class
 com/example/usermanagementservice/domain/User$UserBuilderImpl.class
 com/example/usermanagementservice/domain/JpaAuditEntity$JpaAuditEntityBuilder.class
 com/example/usermanagementservice/controller/request/CreateUserRequest$CreateUserRequestBuilder.class
+com/example/usermanagementservice/config/SecurityConfig.class
 com/example/usermanagementservice/controller/UserController.class
 com/example/usermanagementservice/client/KeycloakManagerClient.class
 com/example/usermanagementservice/mapper/JpaAuditMapper.class

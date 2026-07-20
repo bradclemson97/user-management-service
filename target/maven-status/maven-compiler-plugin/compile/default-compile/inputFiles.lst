@@ -8,6 +8,7 @@
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/mapper/UserDetailsMapper.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/config/SystemConstant.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/domain/enums/YesNo.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/config/SecurityConfig.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/domain/User.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/domain/UserDetails.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/repository/UserDetailsRepository.java

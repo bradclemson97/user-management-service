@@ -1,5 +1,6 @@
 package com.example.usermanagementservice.controller;
 
+import com.example.security.annotation.RequiresCapability;
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
 import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
@@ -48,6 +49,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(API_VERSION + API_USER)
 public interface UserController {
 
+    @RequiresCapability("Create users")
     @Operation(summary = "Create new user", description = "Create a new user")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -55,6 +57,7 @@ public interface UserController {
     CreateUserResponse createUser(
             @RequestBody @Valid CreateUserRequest userRequest);
 
+    @RequiresCapability("Search and View users")
     @Operation(summary = "Get user", description = "Get user information for the provided systemUserId")
     @GetMapping("{systemUserId}")
     UserDto getUser(
@@ -62,6 +65,7 @@ public interface UserController {
             description = "The user's unique reference")
             @PathVariable UUID systemUserId);
 
+    @RequiresCapability("Search and View users")
     @Operation(summary = "Get user by primary email", description = "Get user information for the provided primaryEmail")
     @GetMapping(API_EMAIL + "/" + "{primaryEmailId}")
     UserDto getUserByPrimaryEmail(
@@ -74,9 +78,10 @@ public interface UserController {
     @GetMapping(API_CURRENT)
     UserDto getCurrentUser(
             @NotNull(message = "Session token is required")
-            @AuthenticationPrincipal(expression = "systemUserId")
+            @AuthenticationPrincipal(expression = "subject")
             UUID systemUserId);
 
+    @RequiresCapability("Search and View users")
     @Operation(summary = "Get user SOI",
             description = "Get user SOI fir the provided systemUserId")
     @GetMapping(API_SOI + "/{systemUserId}")
@@ -85,6 +90,7 @@ public interface UserController {
                     description = "The user's unique reference")
             @PathVariable UUID systemUserId);
 
+    @RequiresCapability("Manage users account")
     @Operation(summary = "Update user", description = "Update user profile details — creates a new temporal UserDetails record")
     @PutMapping("{systemUserId}")
     @ApiResponse(responseCode = "200", description = "User updated successfully")
@@ -94,6 +100,7 @@ public interface UserController {
             @PathVariable UUID systemUserId,
             @RequestBody @Valid UpdateUserRequest request);
 
+    @RequiresCapability("Manage users account")
     @Operation(summary = "Deactivate user", description = "Deactivate a user account")
     @DeleteMapping("{systemUserId}" + API_DEACTIVATE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -103,6 +110,7 @@ public interface UserController {
                     description = "The user's unique reference")
             @PathVariable UUID systemUserId);
 
+    @RequiresCapability("Search and View users")
     @Operation(summary = "search for users",
     description = "seach users with the provided request and return a user dto")
     @GetMapping
