@@ -51,16 +51,39 @@ Configuration is primarily handled via `application.yml`.
 | `DB_PORT` | PostgreSQL Database Port | `5432` |
 | `KEYCLOAK_MANAGER_URL` | Base URL for the Keycloak Manager | `http://localhost:8210` |
 | `ACM_URL` | Base URL for the Access Control Manager | `http://localhost:8130` |
+| `KEYCLOAK_ISSUER_URI` | Keycloak realm issuer URI for JWT validation | `http://localhost:9000/realms/system` |
 
 ## 6. Development & Build
 
 ### Prerequisites
 * JDK 17
-* PostgreSQL
+* Docker (for PostgreSQL and Keycloak)
 * Maven (included wrapper)
 
-### Commands
-* **Build the project**: 
+### 6.1 Start Infrastructure
+
+A `docker-compose.yml` is provided at the root of the `IdeaProjects` directory to spin up PostgreSQL and Keycloak:
+
+```bash
+cd /path/to/IdeaProjects
+docker compose up -d
+```
+
+This starts:
+- **PostgreSQL 15** on `localhost:5432` — database `userdb`, credentials `postgres`/`password`
+- **Keycloak 24** on `localhost:9000` — admin credentials `admin`/`admin`
+
+Wait for Keycloak to report healthy (≈30–60 s) before starting the service. You can check with:
+
+```bash
+docker compose ps
+```
+
+> **Note**: The `system` realm must be created manually in Keycloak before JWT validation will work. See [Section 9](#9-manual-setup-steps).
+
+### 6.2 Build & Run
+
+* **Build the project**:
     ```bash
     ./mvnw clean package
     ```
@@ -84,11 +107,19 @@ User Creation Process Visualisation
 
 These steps must be completed once after the services are first started. They cannot be automated because they depend on runtime state in Keycloak and external configuration.
 
-### 9.1 Bootstrap the Superuser in Keycloak
+### 9.1 Create the Keycloak Realm
+
+Before any authentication can work, the `system` realm must exist in Keycloak.
+
+1. Navigate to `http://localhost:9000` and sign in as `admin` / `admin`.
+2. Click the realm dropdown (top-left) and select **Create realm**.
+3. Set **Realm name** to `system` and click **Create**.
+
+### 9.2 Bootstrap the Superuser in Keycloak
 
 The Flyway migrations automatically create the superuser record in both the `user_management` and `access_control` databases with the fixed UUID `a0000000-0000-0000-0000-000000000001`. However, the matching Keycloak account must be created manually.
 
-**Option A — via the Keycloak Manager API (recommended)**
+**Option A — via the Keycloak Manager API (recommended, requires realm to exist)**
 
 Call the Keycloak Manager's create-user endpoint, passing the pre-assigned system user ID so that all three systems share the same identity:
 
@@ -115,7 +146,7 @@ The response contains a generated temporary passphrase — save this, it is the 
 5. Under the **Attributes** tab, add a custom attribute `systemUserId` with value `a0000000-0000-0000-0000-000000000001`. This must match the claim the security library reads (configured via `access-control.security.system-user-id-claim`).
 6. Under the **Credentials** tab, set a temporary password and note it down.
 
-### 9.2 Register the UI Client in Keycloak
+### 9.3 Register the UI Client in Keycloak
 
 The `user-management-ui` requires an OIDC client registered in Keycloak before it can authenticate users.
 
@@ -127,7 +158,7 @@ The `user-management-ui` requires an OIDC client registered in Keycloak before i
 6. Under **Web origins**, add `http://localhost:3000`.
 7. Save, then go to the **Credentials** tab and copy the **Client secret**.
 
-### 9.3 Configure the UI Environment
+### 9.4 Configure the UI Environment
 
 In the `user-management-ui` repository, create a `.env` file from the provided example:
 
@@ -143,12 +174,12 @@ SESSION_SECRET=<generate a long random string>
 KEYCLOAK_BASE_URL=http://localhost:9000
 KEYCLOAK_REALM=system
 KEYCLOAK_CLIENT_ID=user-management-ui
-KEYCLOAK_CLIENT_SECRET=<paste the client secret from step 9.2>
+KEYCLOAK_CLIENT_SECRET=<paste the client secret from step 9.3>
 APP_BASE_URL=http://localhost:3000
 UMS_BASE_URL=http://localhost:8080
 ```
 
-### 9.4 Start the UI
+### 9.5 Start the UI
 
 ```bash
 cd /path/to/user-management-ui
@@ -160,7 +191,7 @@ npm run build && npm start   # production
 
 The UI will be available at `http://localhost:3000`.
 
-### 9.5 First Login as Superuser
+### 9.6 First Login as Superuser
 
 1. Open `http://localhost:3000` in a browser.
 2. You will be redirected to the Keycloak login page.

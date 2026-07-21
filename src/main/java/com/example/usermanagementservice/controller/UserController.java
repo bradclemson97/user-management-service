@@ -78,7 +78,7 @@ public interface UserController {
     @GetMapping(API_CURRENT)
     UserDto getCurrentUser(
             @NotNull(message = "Session token is required")
-            @AuthenticationPrincipal(expression = "subject")
+            @AuthenticationPrincipal(expression = "T(java.util.UUID).fromString(subject)")
             UUID systemUserId);
 
     @RequiresCapability("Search and View users")
