@@ -21,6 +21,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.test.context.TestSecurityContextHolder;
+
+import java.util.Collections;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -115,9 +123,19 @@ class UserControllerTest {
     void getCurrentUser_success() throws Exception {
         Mockito.when(userService.getUser(eq(userId))).thenReturn(userDto);
 
+        // Build a JWT whose subject is the user UUID. The .with() RequestPostProcessor
+        // runs after all global MockMvc processors (including SecurityMockMvcConfigurer's
+        // TestSecurityContextHolderPostProcessor), so it has the final say on what
+        // SecurityContextHolder holds when AuthenticationPrincipalArgumentResolver runs.
+        Jwt jwtToken = Jwt.withTokenValue("token")
+                .header("alg", "RS256")
+                .subject(userId.toString())
+                .build();
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(new JwtAuthenticationToken(jwtToken, Collections.emptyList()));
+
         mockMvc.perform(get("/v1/user/current")
-                        .principal(() -> "dummyPrincipal")
-                        .requestAttr("systemUserId", userId)) // Simulate AuthenticationPrincipal
+                        .with(request -> { SecurityContextHolder.setContext(context); return request; }))
                 .andExpect(status().isOk());
     }
 

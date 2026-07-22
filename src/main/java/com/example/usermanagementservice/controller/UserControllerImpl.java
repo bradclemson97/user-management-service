@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -63,7 +64,7 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public UserDto getCurrentUser(UUID systemUserId) {
+    public UserDto getCurrentUser(@AuthenticationPrincipal(expression = "T(java.util.UUID).fromString(subject)") UUID systemUserId) {
         log.info("Attempting to retrieve the current user {}",
                 systemUserId);
         UserDto user = userService.getUser(systemUserId);

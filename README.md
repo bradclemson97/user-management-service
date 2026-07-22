@@ -51,22 +51,58 @@ Configuration is primarily handled via `application.yml`.
 | `DB_PORT` | PostgreSQL Database Port | `5432` |
 | `KEYCLOAK_MANAGER_URL` | Base URL for the Keycloak Manager | `http://localhost:8210` |
 | `ACM_URL` | Base URL for the Access Control Manager | `http://localhost:8130` |
+| `KEYCLOAK_ISSUER_URI` | Keycloak realm issuer URI for JWT validation | `http://localhost:9000/realms/system` |
 
 ## 6. Development & Build
 
 ### Prerequisites
 * JDK 17
-* PostgreSQL
+* Docker (for PostgreSQL and Keycloak)
 * Maven (included wrapper)
 
-### Commands
-* **Build the project**: 
+To install Docker without Docker-Desktop:
+```bash
+brew install docker colima.
+colima start
+brew install docker-compose 
+mkdir -p ~/.docker/cli-plugins  
+ln -sfn $(brew --prefix)/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+```
+
+### 6.1 Start Infrastructure
+
+A `docker-compose.yml` is provided at the root of the `IdeaProjects` directory to spin up PostgreSQL and Keycloak:
+
+```bash
+cd ~/IdeaProjects
+docker compose up -d
+```
+
+This starts:
+- **PostgreSQL 15** on `localhost:5432` — database `userdb`, credentials `postgres`/`password`
+- **Keycloak 24** on `localhost:9000` — admin credentials `admin`/`admin`
+
+Wait for Keycloak to report healthy (≈30–60 s) before starting the service. You can check with:
+
+```bash
+docker compose ps
+```
+
+> **Note**: The `system` realm must be created manually in Keycloak before JWT validation will work. See [Section 9](#9-manual-setup-steps).
+
+### 6.2 Build & Run
+
+* **Build the project**:
     ```bash
     ./mvnw clean package
     ```
 * **Run locally**:
     ```bash
     ./mvnw spring-boot:run
+    ```
+* **Stop running**:
+    ```bash
+    lsof -ti :8080 | xargs kill -9
     ```
 
 ## 7. API Documentation
@@ -84,11 +120,19 @@ User Creation Process Visualisation
 
 These steps must be completed once after the services are first started. They cannot be automated because they depend on runtime state in Keycloak and external configuration.
 
-### 9.1 Bootstrap the Superuser in Keycloak
+### 9.1 Create the Keycloak Realm
+
+Before any authentication can work, the `system` realm must exist in Keycloak.
+
+1. Navigate to `http://localhost:9000` and sign in as `admin` / `admin`.
+2. Click the realm dropdown (top-left) and select **Create realm**.
+3. Set **Realm name** to `system` and click **Create**.
+
+### 9.2 Bootstrap the Superuser in Keycloak
 
 The Flyway migrations automatically create the superuser record in both the `user_management` and `access_control` databases with the fixed UUID `a0000000-0000-0000-0000-000000000001`. However, the matching Keycloak account must be created manually.
 
-**Option A — via the Keycloak Manager API (recommended)**
+**Option A — via the Keycloak Manager API (recommended, requires realm to exist)**
 
 Call the Keycloak Manager's create-user endpoint, passing the pre-assigned system user ID so that all three systems share the same identity:
 
@@ -110,12 +154,13 @@ The response contains a generated temporary passphrase — save this, it is the 
 
 1. Navigate to `http://localhost:9000` and sign in as the Keycloak admin.
 2. Select the correct realm (e.g. `system`).
-3. Go to **Users** > **Add user**.
-4. Set **Username** to `superuser@system.local`, **Email** to `superuser@system.local`, **First name** to `Super`, **Last name** to `User`.
-5. Under the **Attributes** tab, add a custom attribute `systemUserId` with value `a0000000-0000-0000-0000-000000000001`. This must match the claim the security library reads (configured via `access-control.security.system-user-id-claim`).
-6. Under the **Credentials** tab, set a temporary password and note it down.
+3. Add systemUserId as an attribute in Realm Settings > User Profile 
+4. Go to **Users** > **Add user**.
+5. Set **Username** to `superuser@system.local`, **Email** to `superuser@system.local`, **First name** to `Super`, **Last name** to `User`.
+6. Under the **Attributes** tab, add a custom attribute `systemUserId` with value `a0000000-0000-0000-0000-000000000001`. This must match the claim the security library reads (configured via `access-control.security.system-user-id-claim`).
+7. Under the **Credentials** tab, set a temporary password and note it down.
 
-### 9.2 Register the UI Client in Keycloak
+### 9.3 Register the UI Client in Keycloak
 
 The `user-management-ui` requires an OIDC client registered in Keycloak before it can authenticate users.
 
@@ -127,7 +172,89 @@ The `user-management-ui` requires an OIDC client registered in Keycloak before i
 6. Under **Web origins**, add `http://localhost:3000`.
 7. Save, then go to the **Credentials** tab and copy the **Client secret**.
 
-### 9.3 Configure the UI Environment
+### 9.4 Add the `systemUserId` Protocol Mapper to the UI Client
+
+The `user-management-ui` client must include the `systemUserId` user attribute as a claim in its JWTs so the security library can look up the authenticated user in ACM.
+
+1. In the Keycloak Admin Console, go to **Clients** and open `user-management-ui`.
+2. Go to the **Client scopes** tab and click the dedicated scope (e.g. `user-management-ui-dedicated`).
+3. Click **Add mapper** > **By configuration** > **User Attribute**.
+4. Fill in the fields:
+
+| Field | Value |
+|---|---|
+| Name | `systemUserId` |
+| User Attribute | `systemUserId` |
+| Token Claim Name | `systemUserId` |
+| Claim JSON Type | `String` |
+| Add to ID token | On |
+| Add to access token | On |
+| Add to userinfo | On |
+
+5. Click **Save**.
+
+After saving, newly issued JWTs from this client will contain `"systemUserId": "<uuid>"` as a top-level claim.
+
+### 9.5 Register the Keycloak Manager Service Client
+
+The `keycloak-manager` service calls the Keycloak Admin REST API using the OAuth2 client credentials grant. You must register its service account client and grant it permission to manage users.
+
+**Create the client:**
+
+1. In the Keycloak Admin Console, go to **Clients** > **Create client**.
+2. Set **Client ID** to `system-manager-service`.
+3. Set **Client authentication** to **On** (confidential).
+4. Disable **Standard flow** and **Direct access grants** — only **Service accounts roles** is needed.
+5. Save, then go to the **Credentials** tab and note (or set) the **Client secret**. The default configured value is `pdjofnwondhwinskwe`; update `KEYCLOAK_MANAGER_SECRET` in keycloak-manager's environment if you use a different value.
+
+**Grant the service account admin permissions:**
+
+6. Go to the **Service accounts roles** tab of the `system-manager-service` client.
+7. Click **Assign role**, filter by **realm-management**, and select **manage-users**.
+8. Click **Assign**.
+
+The service account for `system-manager-service` can now create and delete users in the `system` realm.
+
+**Alternatively, using `kcadm.sh`:**
+
+```bash
+# Create the client
+docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
+  --server http://localhost:8080 --realm master --user admin --password admin
+
+docker exec keycloak /opt/keycloak/bin/kcadm.sh create clients -r system \
+  -s clientId=system-manager-service \
+  -s enabled=true \
+  -s clientAuthenticatorType=client-secret \
+  -s secret=pdjofnwondhwinskwe \
+  -s serviceAccountsEnabled=true \
+  -s publicClient=false \
+  -s standardFlowEnabled=false \
+  -s directAccessGrantsEnabled=false
+
+# Grant manage-users to the service account
+docker exec keycloak /opt/keycloak/bin/kcadm.sh add-roles \
+  -r system \
+  --uusername service-account-system-manager-service \
+  --cclientid realm-management \
+  --rolename manage-users
+```
+
+### 9.6 Create the `system-users` Group
+
+All users created through the application are automatically added to the `system-users` group in Keycloak. The group must exist before the first user can be created.
+
+1. In the Keycloak Admin Console, go to **Groups** > **Create group**.
+2. Set **Name** to `system-users`.
+3. Click **Create**.
+
+**Alternatively, using `kcadm.sh`:**
+
+```bash
+docker exec keycloak /opt/keycloak/bin/kcadm.sh create groups -r system -s name=system-users
+```
+
+### 9.7 Configure the UI Environment
 
 In the `user-management-ui` repository, create a `.env` file from the provided example:
 
@@ -143,15 +270,15 @@ SESSION_SECRET=<generate a long random string>
 KEYCLOAK_BASE_URL=http://localhost:9000
 KEYCLOAK_REALM=system
 KEYCLOAK_CLIENT_ID=user-management-ui
-KEYCLOAK_CLIENT_SECRET=<paste the client secret from step 9.2>
+KEYCLOAK_CLIENT_SECRET=<paste the client secret from step 9.3>
 APP_BASE_URL=http://localhost:3000
 UMS_BASE_URL=http://localhost:8080
 ```
 
-### 9.4 Start the UI
+### 9.8 Start the UI
 
 ```bash
-cd /path/to/user-management-ui
+cd ~/IdeaProjects/user-management-ui
 npm install
 npm run dev       # development (hot-reload)
 # or
@@ -160,12 +287,14 @@ npm run build && npm start   # production
 
 The UI will be available at `http://localhost:3000`.
 
-### 9.5 First Login as Superuser
+### 9.9 First Login as Superuser
 
 1. Open `http://localhost:3000` in a browser.
 2. You will be redirected to the Keycloak login page.
-3. Sign in with `superuser@system.local` and the temporary passphrase obtained in step 9.1.
+3. Sign in with `superuser@system.local` and the temporary passphrase obtained in step 9.2.
 4. Keycloak will prompt you to set a permanent password on first login.
 5. After authentication you will be redirected back to the user list.
 
 The superuser has all roles and capabilities pre-assigned via the ACM bootstrap migration, so every protected endpoint in UMS and ACM is accessible immediately after login.
+
+To logout: http://localhost:3000/auth/logout 

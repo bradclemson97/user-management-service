@@ -31,6 +31,11 @@ spring:
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:9000/realms/system}
   cloud:
     config:
       enabled: false
@@ -63,4 +68,4 @@ clients:
 access-control:
   security:
     manager-url: ${ACM_URL:http://localhost:8130}
-    system-user-id-claim: sub
+    system-user-id-claim: systemUserId
