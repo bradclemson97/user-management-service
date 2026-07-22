@@ -21,7 +21,7 @@ public class JpaAuditMapperImpl implements JpaAuditMapper {
         UserAuditSoi.UserAuditSoiBuilder userAuditSoi = UserAuditSoi.builder();
 
         userAuditSoi.user( uuidToUserSoiDto( entity.getCreatedBy() ) );
-        userAuditSoi.dateTime( entity.getCreatedDate() );
+        userAuditSoi.dateTime( instantToOffsetDateTime( entity.getCreatedDate() ) );
 
         return userAuditSoi.build();
     }
@@ -35,7 +35,7 @@ public class JpaAuditMapperImpl implements JpaAuditMapper {
         UserAuditSoi.UserAuditSoiBuilder userAuditSoi = UserAuditSoi.builder();
 
         userAuditSoi.user( uuidToUserSoiDto( entity.getModifiedBy() ) );
-        userAuditSoi.dateTime( entity.getModifiedDate() );
+        userAuditSoi.dateTime( instantToOffsetDateTime( entity.getModifiedDate() ) );
 
         return userAuditSoi.build();
     }

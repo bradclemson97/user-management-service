@@ -12,7 +12,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -43,7 +43,7 @@ public abstract class JpaAuditEntity {
      */
     @CreatedDate
     @Column(nullable = false)
-    private OffsetDateTime createdDate;
+    private Instant createdDate;
 
     /**
      * The user who modified the entity.
@@ -57,5 +57,5 @@ public abstract class JpaAuditEntity {
      */
     @LastModifiedDate
     @Column(nullable = false)
-    private OffsetDateTime modifiedDate;
+    private Instant modifiedDate;
 }

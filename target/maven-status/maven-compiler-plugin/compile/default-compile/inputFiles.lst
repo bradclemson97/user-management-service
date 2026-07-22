@@ -4,6 +4,7 @@
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/model/UserDetailsDto.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/domain/enums/UserSearchSort.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/mapper/JpaAuditMapper.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/config/JpaConfig.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/response/AcmCreateUserResponse.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/mapper/UserDetailsMapper.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/config/SystemConstant.java

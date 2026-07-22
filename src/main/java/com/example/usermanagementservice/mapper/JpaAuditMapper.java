@@ -7,6 +7,9 @@ import com.example.usermanagementservice.model.UserAuditSoi;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
@@ -27,6 +30,10 @@ public interface JpaAuditMapper {
     @Mapping(source = "entity.modifiedDate", target = "dateTime")
     @Named("modifiedToAuditSoi")
     UserAuditSoi modifiedToAuditSoi(JpaAuditEntity entity);
+
+    default OffsetDateTime instantToOffsetDateTime(Instant instant) {
+        return instant != null ? instant.atOffset(ZoneOffset.UTC) : null;
+    }
 
     // Conversion from UUID to UserSoiDto
     @Named("uuidToUserSoiDto")
