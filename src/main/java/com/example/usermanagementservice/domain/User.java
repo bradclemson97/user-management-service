@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -49,6 +50,13 @@ public class User extends JpaAuditEntity {
     @Enumerated(STRING)
     @Builder.Default
     private YesNo active = YesNo.YES;
+
+    @Column(name = "last_login_date")
+    private Instant lastLoginDate;
+
+    @Column(name = "failed_login_attempts", nullable = false)
+    @Builder.Default
+    private int failedLoginAttempts = 0;
 
     @OneToMany(mappedBy = "user", cascade = ALL, fetch = EAGER)
     @EqualsAndHashCode.Exclude

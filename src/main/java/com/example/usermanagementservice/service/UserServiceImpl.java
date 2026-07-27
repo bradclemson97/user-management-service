@@ -31,6 +31,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -194,6 +195,51 @@ public class UserServiceImpl implements UserService {
         user = userRepository.save(user);
         log.info("Updated user details for systemUserId {}", systemUserId);
         return userMapper.userToDto(user);
+    }
+
+    @Override
+    @Transactional
+    public void recordLogin(UUID systemUserId) {
+        User user = findUser(systemUserId);
+        user.setLastLoginDate(Instant.now());
+        userRepository.save(user);
+        log.info("Recorded login for user {}", systemUserId);
+    }
+
+    @Override
+    @Transactional
+    public void lockUser(UUID systemUserId, int failedAttempts) {
+        User user = findUser(systemUserId);
+        user.setLocked(YesNo.YES);
+        user.setFailedLoginAttempts(failedAttempts);
+        userRepository.save(user);
+        log.info("Locked user {}", systemUserId);
+        try {
+            acmClient.lockUser(systemUserId.toString());
+        } catch (Exception e) {
+            log.warn("Failed to sync lock state to ACM for user {} — may be running in scheduler context: {}", systemUserId, e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void unlockUser(UUID systemUserId) {
+        User user = findUser(systemUserId);
+        user.setLocked(YesNo.NO);
+        user.setFailedLoginAttempts(0);
+        userRepository.save(user);
+        log.info("Unlocked user {}", systemUserId);
+        try {
+            String email = user.getCurrentUserDetails().getPrimaryEmail();
+            keycloakManagerClient.unlockInKeycloak(email);
+        } catch (Exception e) {
+            log.warn("Failed to unlock user {} in Keycloak: {}", systemUserId, e.getMessage());
+        }
+        try {
+            acmClient.unlockUser(systemUserId.toString());
+        } catch (Exception e) {
+            log.warn("Failed to sync unlock state to ACM for user {}: {}", systemUserId, e.getMessage());
+        }
     }
 
     @Override

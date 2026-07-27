@@ -100,12 +100,41 @@ public interface UserController {
             @PathVariable UUID systemUserId,
             @RequestBody @Valid UpdateUserRequest request);
 
+    @Operation(summary = "Record user login", description = "Updates the user's last login timestamp — called by the UI on every successful OIDC callback")
+    @PutMapping("{systemUserId}" + API_LOGIN)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode = "204", description = "Login recorded successfully")
+    void recordLogin(
+            @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
+                    description = "The user's unique reference")
+            @PathVariable UUID systemUserId);
+
     @RequiresCapability("Manage users account")
     @Operation(summary = "Deactivate user", description = "Deactivate a user account")
     @DeleteMapping("{systemUserId}" + API_DEACTIVATE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiResponse(responseCode = "204", description = "User deactivated successfully")
     void deactivateUser(
+            @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
+                    description = "The user's unique reference")
+            @PathVariable UUID systemUserId);
+
+    @RequiresCapability("Manage users account")
+    @Operation(summary = "Lock user account", description = "Sets the user's locked status to YES and syncs to ACM")
+    @PutMapping("{systemUserId}" + API_LOCK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode = "204", description = "User locked successfully")
+    void lockUser(
+            @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
+                    description = "The user's unique reference")
+            @PathVariable UUID systemUserId);
+
+    @RequiresCapability("Manage users account")
+    @Operation(summary = "Unlock user account", description = "Clears the user's lock flag, resets failed attempts, and syncs to Keycloak and ACM")
+    @DeleteMapping("{systemUserId}" + API_LOCK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode = "204", description = "User unlocked successfully")
+    void unlockUser(
             @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
                     description = "The user's unique reference")
             @PathVariable UUID systemUserId);

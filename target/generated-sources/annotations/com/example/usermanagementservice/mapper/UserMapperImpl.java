@@ -96,6 +96,8 @@ public class UserMapperImpl implements UserMapper {
         userDto.userDetails( userDetailsMapper.userDetailsToDto( user.getCurrentUserDetails() ) );
         userDto.systemUserId( user.getSystemUserId() );
         userDto.active( user.getActive() );
+        userDto.locked( user.getLocked() );
+        userDto.failedLoginAttempts( user.getFailedLoginAttempts() );
 
         return userDto.build();
     }

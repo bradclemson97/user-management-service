@@ -15,4 +15,6 @@ public class SystemConstant {
     public static final String API_SOI = "/soi";
     public static final String API_EMAIL = "/email";
     public static final String API_DEACTIVATE = "/deactivate";
+    public static final String API_LOGIN = "/login";
+    public static final String API_LOCK = "/lock";
 }

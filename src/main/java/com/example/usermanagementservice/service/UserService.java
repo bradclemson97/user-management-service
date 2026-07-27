@@ -96,4 +96,26 @@ public interface UserService {
      * @param systemUserId the systemUserId of the user to deactivate
      */
     void deactivateUser(UUID systemUserId);
+
+    /**
+     * Record a successful login for the user by updating their last_login_date to now.
+     *
+     * @param systemUserId the systemUserId of the user who logged in
+     */
+    void recordLogin(UUID systemUserId);
+
+    /**
+     * Lock a user account after too many failed login attempts.
+     *
+     * @param systemUserId the systemUserId of the user to lock
+     * @param failedAttempts the current failed attempt count from Keycloak
+     */
+    void lockUser(UUID systemUserId, int failedAttempts);
+
+    /**
+     * Unlock a user account and clear their failed login attempt counter.
+     *
+     * @param systemUserId the systemUserId of the user to unlock
+     */
+    void unlockUser(UUID systemUserId);
 }

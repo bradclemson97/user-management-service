@@ -34,6 +34,8 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "locked", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "failedLoginAttempts", ignore = true)
+    @Mapping(target = "lastLoginDate", ignore = true)
     User requestToUser(CreateUserRequest request);
 
     /**
