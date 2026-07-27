@@ -6,9 +6,11 @@ import com.example.usermanagementservice.client.request.AcmCreateUserRequest;
 import com.example.usermanagementservice.client.response.AcmCreateUserResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
@@ -37,4 +39,16 @@ public interface AcmClient {
     @Cacheable(value = "acm_user_cache")
     @GetMapping("/v1/user/{systemUserId}")
     AcmUserDto getUser(@PathVariable String systemUserId);
+
+    /**
+     * Lock a user in ACM.
+     */
+    @PutMapping("/v1/user/{systemUserId}/lock")
+    void lockUser(@PathVariable String systemUserId);
+
+    /**
+     * Unlock a user in ACM.
+     */
+    @DeleteMapping("/v1/user/{systemUserId}/lock")
+    void unlockUser(@PathVariable String systemUserId);
 }

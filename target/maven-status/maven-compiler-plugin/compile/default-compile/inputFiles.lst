@@ -16,6 +16,7 @@
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/controller/response/CreateUserResponse.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/response/KeycloakCreateUserResponse.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/UserManagementApplication.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/scheduler/UserInactivityScheduler.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/model/AcmUserDto.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/request/AcmCreateUserRequest.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/exception/ConflictException.java
@@ -25,9 +26,11 @@
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/controller/request/UpdateUserRequest.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/service/UserService.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/KeycloakManagerClient.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/scheduler/UserLockSyncScheduler.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/controller/UserController.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/model/UserAuditSoi.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/exception/NotFoundException.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/response/KeycloakLockoutStatusResponse.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/model/UserDto.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/exception/GlobalExceptionHandler.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/AcmClient.java

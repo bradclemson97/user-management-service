@@ -31,6 +31,7 @@ com/example/usermanagementservice/exception/response/ApiError.class
 com/example/usermanagementservice/model/UserSoiDto$UserSoiDtoBuilder.class
 com/example/usermanagementservice/client/model/RoleDto.class
 com/example/usermanagementservice/exception/ConflictException.class
+com/example/usermanagementservice/client/response/KeycloakLockoutStatusResponse.class
 com/example/usermanagementservice/domain/enums/YesNo.class
 com/example/usermanagementservice/client/model/RoleDto$RoleDtoBuilder.class
 com/example/usermanagementservice/mapper/UserMapper.class
@@ -43,10 +44,13 @@ com/example/usermanagementservice/domain/JpaAuditEntity$JpaAuditEntityBuilder.cl
 com/example/usermanagementservice/config/JpaConfig.class
 com/example/usermanagementservice/controller/request/CreateUserRequest$CreateUserRequestBuilder.class
 com/example/usermanagementservice/config/SecurityConfig.class
+com/example/usermanagementservice/client/response/KeycloakLockoutStatusResponse$KeycloakLockoutStatusResponseBuilder.class
 com/example/usermanagementservice/controller/UserController.class
+com/example/usermanagementservice/scheduler/UserInactivityScheduler.class
 com/example/usermanagementservice/client/KeycloakManagerClient.class
 com/example/usermanagementservice/mapper/JpaAuditMapper.class
 com/example/usermanagementservice/UserManagementApplication.class
+com/example/usermanagementservice/scheduler/UserLockSyncScheduler.class
 com/example/usermanagementservice/mapper/UserMapperImpl.class
 com/example/usermanagementservice/client/response/KeycloakCreateUserResponse$KeycloakCreateUserResponseBuilder.class
 com/example/usermanagementservice/model/UserDto.class

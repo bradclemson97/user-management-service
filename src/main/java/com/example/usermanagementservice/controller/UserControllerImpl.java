@@ -92,10 +92,30 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
+    public void recordLogin(UUID systemUserId) {
+        log.info("Recording login for user {}", systemUserId);
+        userService.recordLogin(systemUserId);
+    }
+
+    @Override
     public void deactivateUser(UUID systemUserId) {
         log.info("Attempting to deactivate user {}", systemUserId);
         userService.deactivateUser(systemUserId);
         log.info("Successfully deactivated user {}", systemUserId);
+    }
+
+    @Override
+    public void lockUser(UUID systemUserId) {
+        log.info("Attempting to lock user {}", systemUserId);
+        userService.lockUser(systemUserId, 0);
+        log.info("Successfully locked user {}", systemUserId);
+    }
+
+    @Override
+    public void unlockUser(UUID systemUserId) {
+        log.info("Attempting to unlock user {}", systemUserId);
+        userService.unlockUser(systemUserId);
+        log.info("Successfully unlocked user {}", systemUserId);
     }
 
     @Override

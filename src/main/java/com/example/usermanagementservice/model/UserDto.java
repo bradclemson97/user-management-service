@@ -19,5 +19,7 @@ public class UserDto {
 
     private UUID systemUserId;
     private YesNo active;
+    private YesNo locked;
+    private int failedLoginAttempts;
     private UserDetailsDto userDetails;
 }
