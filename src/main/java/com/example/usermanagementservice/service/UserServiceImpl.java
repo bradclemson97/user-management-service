@@ -131,6 +131,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserDto> getAllUsers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, UserSearchSort.NAME.getSort(Sort.Direction.ASC));
+        return userRepository.findAll(pageRequest).map(userMapper::userToDto);
+    }
+
+    @Override
     public Page<UserDto> search(String name, UserSearchSort sortBy, Sort.Direction sortDirection,
                                 int page, int size) {
         Sort sort = sortBy.getSort(sortDirection);

@@ -69,6 +69,15 @@ public interface UserService {
     UserSoiDto getUserSoi(UUID systemUserId);
 
     /**
+     * Return all users paginated, sorted alphabetically by last name then first name.
+     *
+     * @param page page number (0-based)
+     * @param size page size
+     * @return paginated UserDto
+     */
+    Page<UserDto> getAllUsers(int page, int size);
+
+    /**
      * Search for user by given criteria in request.
      *
      * @param name the user's name
