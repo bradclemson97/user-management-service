@@ -17,4 +17,5 @@ public class SystemConstant {
     public static final String API_DEACTIVATE = "/deactivate";
     public static final String API_LOGIN = "/login";
     public static final String API_LOCK = "/lock";
+    public static final String API_ALL = "/all";
 }

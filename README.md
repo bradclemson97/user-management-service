@@ -311,7 +311,14 @@ APP_BASE_URL=http://localhost:3000
 UMS_BASE_URL=http://localhost:8080
 ```
 
-### 9.8 Start the UI
+### 9.8 Set the Keycloak login theme
+
+1. In the Keycloak Admin Console, go to **Realm Settings** → **Themes**
+2. Set Login theme to **gov-uk**
+3. Save
+4. Check:  **Realm Settings** → **Login** → **Email as username** is checked/enabled  
+
+### 9.9 Start the UI
 
 ```bash
 cd ~/IdeaProjects/user-management-ui
@@ -323,7 +330,7 @@ npm run build && npm start   # production
 
 The UI will be available at `http://localhost:3000`.
 
-### 9.9 First Login as Superuser
+### 10.0 First Login as Superuser
 
 1. Open `http://localhost:3000` in a browser.
 2. You will be redirected to the Keycloak login page.

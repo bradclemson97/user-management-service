@@ -119,6 +119,14 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
+    public Page<UserDto> getAllUsers(int page, int size) {
+        log.info("Fetching all users, page {}, size {}", page, size);
+        Page<UserDto> results = userService.getAllUsers(page, size);
+        log.info("Returning {} of {} users", results.getNumberOfElements(), results.getTotalElements());
+        return results;
+    }
+
+    @Override
     public Page<UserDto> userSearch(String name, UserSearchSort sort, Sort.Direction direction,
                                     int page, int size) {
         log.info("attempting to search for user with name {}, page {}, size {}, sort {}, direction {}",

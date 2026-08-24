@@ -140,6 +140,19 @@ public interface UserController {
             @PathVariable UUID systemUserId);
 
     @RequiresCapability("Search and View users")
+    @Operation(summary = "Get all users", description = "Returns all users paginated, sorted alphabetically by name")
+    @GetMapping(API_ALL)
+    Page<UserDto> getAllUsers(
+            @PositiveOrZero(message = "The page number must be at least 0")
+            @Parameter(description = "Page number", example = "0")
+            @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
+            int page,
+            @Positive(message = "The page size must be at least 1")
+            @Parameter(description = "Page size", example = "25")
+            @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+            int size);
+
+    @RequiresCapability("Search and View users")
     @Operation(summary = "search for users",
     description = "seach users with the provided request and return a user dto")
     @GetMapping
