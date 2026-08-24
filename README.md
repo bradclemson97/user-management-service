@@ -71,7 +71,7 @@ ln -sfn $(brew --prefix)/opt/docker-compose/bin/docker-compose ~/.docker/cli-plu
 
 ### 6.1 Start Infrastructure
 
-A `docker-compose.yml` is provided at the root of the `IdeaProjects` directory to spin up PostgreSQL and Keycloak:
+Copy the local deployment `docker-compose.yml` from user-management-infra and place at the root of the `IdeaProjects` directory.
 
 ```bash
 cd ~/IdeaProjects
@@ -132,7 +132,7 @@ Before any authentication can work, the `system` realm must exist in Keycloak.
 
 The Flyway migrations automatically create the superuser record in both the `user_management` and `access_control` databases with the fixed UUID `a0000000-0000-0000-0000-000000000001`. However, the matching Keycloak account must be created manually.
 
-**Option A — via the Keycloak Manager API (recommended, requires realm to exist)**
+**Option A — via the Keycloak Manager API (local development)**
 
 Call the Keycloak Manager's create-user endpoint, passing the pre-assigned system user ID so that all three systems share the same identity:
 
@@ -150,15 +150,42 @@ Content-Type: application/json
 
 The response contains a generated temporary passphrase — save this, it is the superuser's initial login credential.
 
+> **Production deployment:** The `keycloak-manager` service is not exposed outside the Docker network and its API requires a Bearer token, so Option A cannot be used directly. Instead, SSH into the server and create the user directly via kcadm.sh:
+>
+> ```bash
+> # SSH into the production server
+> ssh <user>@app.bradleyclemson.com
+>
+> # Authenticate kcadm (credentials are in user-management-infra/.env.prod)
+> docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
+>   --server http://localhost:8080 --realm master \
+>   --user <KEYCLOAK_ADMIN> --password <KEYCLOAK_ADMIN_PASSWORD>
+>
+> # Create the superuser with the pre-assigned system user ID
+> docker exec keycloak /opt/keycloak/bin/kcadm.sh create users -r system \
+>   -s username=superuser@system.local \
+>   -s email=superuser@system.local \
+>   -s firstName=Super \
+>   -s lastName=User \
+>   -s enabled=true \
+>   -s 'attributes.systemUserId=["a0000000-0000-0000-0000-000000000001"]'
+>
+> # Set a temporary password (note it down for first login)
+> docker exec keycloak /opt/keycloak/bin/kcadm.sh set-password -r system \
+>   --username superuser@system.local \
+>   --new-password <choose-a-temporary-password> \
+>   --temporary
+> ```
+
 **Option B — via the Keycloak Admin Console**
 
-1. Navigate to `http://localhost:9000` and sign in as the Keycloak admin.
+1. Navigate to `http://localhost:9000` and sign in as the Keycloak admin (`admin` / `admin`)
 2. Select the correct realm (e.g. `system`).
-3. Add systemUserId as an attribute in Realm Settings > User Profile 
+3. Add systemUserId as an attribute in Realm Settings > User Profile, save display name as `${systemUserId}`.
 4. Go to **Users** > **Add user**.
 5. Set **Username** to `superuser@system.local`, **Email** to `superuser@system.local`, **First name** to `Super`, **Last name** to `User`.
-6. Under the **Attributes** tab, add a custom attribute `systemUserId` with value `a0000000-0000-0000-0000-000000000001`. This must match the claim the security library reads (configured via `access-control.security.system-user-id-claim`).
-7. Under the **Credentials** tab, set a temporary password and note it down.
+6. Set the attribute **systemUserId** to `a0000000-0000-0000-0000-000000000001`. This must match the claim the security library reads (configured via `access-control.security.system-user-id-claim`).
+7. Under the **Credentials** tab, set a temporary password (e.g. `admin` and note it down.
 
 ### 9.3 Register the UI Client in Keycloak
 
@@ -171,6 +198,8 @@ The `user-management-ui` requires an OIDC client registered in Keycloak before i
 5. Under **Valid post logout redirect URIs**, add `http://localhost:3000`.
 6. Under **Web origins**, add `http://localhost:3000`.
 7. Save, then go to the **Credentials** tab and copy the **Client secret**.
+
+> **Production deployment:** Replace every `http://localhost:3000` URI above with `https://app.bradleyclemson.com` (i.e. redirect URI becomes `https://app.bradleyclemson.com/auth/callback`, post-logout URI becomes `https://app.bradleyclemson.com`). The Keycloak Admin Console is accessible at `https://app.bradleyclemson.com/admin`.
 
 ### 9.4 Add the `systemUserId` Protocol Mapper to the UI Client
 
@@ -209,9 +238,10 @@ The `keycloak-manager` service calls the Keycloak Admin REST API using the OAuth
 
 **Grant the service account admin permissions:**
 
-6. Go to the **Service accounts roles** tab of the `system-manager-service` client.
-7. Click **Assign role**, filter by **realm-management**, and select **manage-users**.
-8. Click **Assign**.
+6. Go to the **Service accounts roles** tab of the `system-manager-service` client. 
+7. Look for the filter dropdown at the top-left of the dialog — it will say "Filter by realm roles"
+8. Change it to "Filter by clients"
+9. Now search for and assign **manage-users** and **manage-realm** — you'll see it listed under realm-management.
 
 The service account for `system-manager-service` can now create and delete users in the `system` realm.
 
@@ -232,12 +262,18 @@ docker exec keycloak /opt/keycloak/bin/kcadm.sh create clients -r system \
   -s standardFlowEnabled=false \
   -s directAccessGrantsEnabled=false
 
-# Grant manage-users to the service account
+# Grant manage-users and manage-realm to the service account
 docker exec keycloak /opt/keycloak/bin/kcadm.sh add-roles \
   -r system \
   --uusername service-account-system-manager-service \
   --cclientid realm-management \
   --rolename manage-users
+
+docker exec keycloak /opt/keycloak/bin/kcadm.sh add-roles \
+  -r system \
+  --uusername service-account-system-manager-service \
+  --cclientid realm-management \
+  --rolename manage-realm
 ```
 
 ### 9.6 Create the `system-users` Group
