@@ -8,7 +8,9 @@ import com.example.usermanagementservice.controller.request.CreateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
+import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
+import com.example.usermanagementservice.domain.enums.YesNo;
 import com.example.usermanagementservice.exception.ConflictException;
 import com.example.usermanagementservice.exception.NotFoundException;
 import com.example.usermanagementservice.mapper.UserMapper;
@@ -149,6 +151,139 @@ class UserServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(userDto, result.getContent().get(0));
+    }
+
+    @Test
+    void getAllUsers_returnsPagedUsers() {
+        User user = User.builder().build();
+        UserDto userDto = UserDto.builder().build();
+        Page<User> userPage = new PageImpl<>(List.of(user));
+
+        when(userRepository.findAll(any(PageRequest.class))).thenReturn(userPage);
+        when(userMapper.userToDto(user)).thenReturn(userDto);
+
+        Page<UserDto> result = userService.getAllUsers(0, 10);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(userDto, result.getContent().get(0));
+    }
+
+    @Test
+    void lockUser_success() {
+        User user = User.builder().build();
+        user.setSystemUserId(userId);
+
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
+        userService.lockUser(userId, 5);
+
+        assertEquals(YesNo.YES, user.getLocked());
+        assertEquals(5, user.getFailedLoginAttempts());
+        verify(userRepository).save(user);
+        verify(acmClient).lockUser(userId.toString());
+    }
+
+    @Test
+    void lockUser_notFound_throwsException() {
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.lockUser(userId, 3));
+    }
+
+    @Test
+    void unlockUser_success() {
+        UserDetails details = UserDetails.builder().primaryEmail("test@example.com").build();
+        User user = User.builder().build();
+        user.setSystemUserId(userId);
+        user.getUserDetails().add(details);
+
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
+        userService.unlockUser(userId);
+
+        assertEquals(YesNo.NO, user.getLocked());
+        assertEquals(0, user.getFailedLoginAttempts());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void unlockUser_notFound_throwsException() {
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.unlockUser(userId));
+    }
+
+    @Test
+    void deactivateUser_success() {
+        User user = User.builder().build();
+        user.setSystemUserId(userId);
+
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
+        userService.deactivateUser(userId);
+
+        assertEquals(YesNo.NO, user.getActive());
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void deactivateUser_notFound_throwsException() {
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.deactivateUser(userId));
+    }
+
+    @Test
+    void updateUser_success() {
+        UpdateUserRequest request = UpdateUserRequest.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .primaryEmail("jane.smith@example.com")
+                .build();
+
+        User user = User.builder().build();
+        user.setSystemUserId(userId);
+        UserDetails newDetails = UserDetails.builder()
+                .primaryEmail("jane.smith@example.com")
+                .build();
+        UserDto userDto = UserDto.builder().build();
+
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.of(user));
+        when(userMapper.updateRequestToUserDetails(request)).thenReturn(newDetails);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.userToDto(user)).thenReturn(userDto);
+
+        UserDto result = userService.updateUser(userId, request);
+
+        assertEquals(userDto, result);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void updateUser_notFound_throwsException() {
+        UpdateUserRequest request = UpdateUserRequest.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .primaryEmail("jane.smith@example.com")
+                .build();
+
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.updateUser(userId, request));
+    }
+
+    @Test
+    void recordLogin_success() {
+        User user = User.builder().build();
+        user.setSystemUserId(userId);
+
+        when(userRepository.findBySystemUserId(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
+        userService.recordLogin(userId);
+
+        assertNotNull(user.getLastLoginDate());
+        verify(userRepository).save(user);
     }
 }
 
