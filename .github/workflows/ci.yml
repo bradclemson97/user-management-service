@@ -13,12 +13,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
-          distribution: temurin
           java-version: '17'
+          distribution: temurin
           cache: maven
+
+      # security-library is a module inside access-control-manager.
+      # It must be installed to the local Maven repo before UMS can compile.
+      # For private repos, add a repo-scoped PAT as secret GH_PAT and replace
+      # ${{ github.token }} below with ${{ secrets.GH_PAT }}.
+      - name: Checkout access-control-manager (for security-library)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/access-control-manager
+          path: access-control-manager
+          token: ${{ github.token }}
+
+      - name: Install security-library
+        working-directory: access-control-manager/security-library
+        run: ../mvnw install -DskipTests
 
       - name: Run tests
         run: ./mvnw test
