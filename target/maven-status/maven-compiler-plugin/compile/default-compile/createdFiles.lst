@@ -2,7 +2,9 @@ com/example/usermanagementservice/service/UserService.class
 com/example/usermanagementservice/domain/User$UserBuilder.class
 com/example/usermanagementservice/model/UserAuditSoi.class
 com/example/usermanagementservice/client/response/AcmCreateUserResponse$AcmCreateUserResponseBuilder.class
+com/example/usermanagementservice/repository/UserHistoryRepository.class
 com/example/usermanagementservice/controller/request/UpdateUserRequest.class
+com/example/usermanagementservice/model/UserAuditRecord.class
 com/example/usermanagementservice/model/UserAuditSoi$UserAuditSoiBuilder.class
 com/example/usermanagementservice/controller/request/CreateUserRequest.class
 com/example/usermanagementservice/client/response/AcmCreateUserResponse.class
@@ -17,6 +19,7 @@ com/example/usermanagementservice/client/response/KeycloakCreateUserResponse.cla
 com/example/usermanagementservice/client/request/AcmCreateUserRequest$AcmCreateUserRequestBuilder.class
 com/example/usermanagementservice/controller/response/CreateUserResponse.class
 com/example/usermanagementservice/model/UserDetailsDto$UserDetailsDtoBuilder.class
+com/example/usermanagementservice/filter/RequestMdcFilter.class
 com/example/usermanagementservice/domain/UserDetails$UserDetailsBuilder.class
 com/example/usermanagementservice/model/UserDetailsDto.class
 com/example/usermanagementservice/domain/User.class
@@ -56,6 +59,7 @@ com/example/usermanagementservice/client/response/KeycloakCreateUserResponse$Key
 com/example/usermanagementservice/model/UserDto.class
 com/example/usermanagementservice/controller/response/CreateUserResponse$CreateUserResponseBuilder.class
 com/example/usermanagementservice/client/model/AcmUserDto$AcmUserDtoBuilder.class
+com/example/usermanagementservice/model/UserAuditRecord$UserAuditRecordBuilder.class
 com/example/usermanagementservice/repository/UserRepository.class
 com/example/usermanagementservice/domain/UserDetails.class
 com/example/usermanagementservice/model/UserDto$UserDtoBuilder.class

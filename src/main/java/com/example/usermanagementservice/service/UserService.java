@@ -6,11 +6,13 @@ import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.User;
 import com.example.usermanagementservice.domain.UserDetails;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
+import com.example.usermanagementservice.model.UserAuditRecord;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -127,4 +129,12 @@ public interface UserService {
      * @param systemUserId the systemUserId of the user to unlock
      */
     void unlockUser(UUID systemUserId);
+
+    /**
+     * Return the audit history for a user (all past states from the history table).
+     *
+     * @param systemUserId the systemUserId of the user
+     * @return list of historical records, newest first
+     */
+    List<UserAuditRecord> getUserHistory(UUID systemUserId);
 }
