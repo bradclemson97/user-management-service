@@ -2,6 +2,7 @@ package com.example.usermanagementservice.controller;
 
 import com.example.usermanagementservice.controller.request.CreateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
+import com.example.usermanagementservice.model.UserAuditRecord;
 import com.example.usermanagementservice.model.UserDetailsDto;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
@@ -27,6 +28,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.test.context.TestSecurityContextHolder;
 
+import java.time.Instant;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -163,6 +165,27 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].systemUserId").value(userId.toString()));
+    }
+
+    @Test
+    void getUserHistory_success() throws Exception {
+        List<UserAuditRecord> history = List.of(
+                UserAuditRecord.builder()
+                        .validFrom(Instant.parse("2025-01-01T00:00:00Z"))
+                        .lockedUserInd("NO")
+                        .activeInd("YES")
+                        .failedLoginAttempts(0)
+                        .modifiedByName("Admin User")
+                        .build()
+        );
+        Mockito.when(userService.getUserHistory(eq(userId))).thenReturn(history);
+
+        mockMvc.perform(get("/v1/user/{systemUserId}/history", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].lockedUserInd").value("NO"))
+                .andExpect(jsonPath("$[0].activeInd").value("YES"))
+                .andExpect(jsonPath("$[0].modifiedByName").value("Admin User"));
     }
 }
 

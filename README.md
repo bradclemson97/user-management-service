@@ -81,8 +81,9 @@ docker compose up -d
 This starts:
 - **PostgreSQL 15** on `localhost:5432` — database `userdb`, credentials `postgres`/`password`
 - **Keycloak 24** on `localhost:9000` — admin credentials `admin`/`admin`
+- **keycloak-manager** on `localhost:8210` — creates protocol mappers in Keycloak on startup
 
-Wait for Keycloak to report healthy (≈30–60 s) before starting the service. You can check with:
+Wait for all three containers to report healthy before starting the service. You can check with:
 
 ```bash
 docker compose ps
@@ -107,7 +108,7 @@ docker compose ps
 
 ## 7. API Documentation
 Detailed API endpoints and request/response models are available via Swagger UI once the service is running:
-`http://localhost:8080/swagger-ui.html`
+`http://localhost:8080/v1/docs`
 
 ## 8. Architecture Diagrams
 User Management Entity Relationship
@@ -224,6 +225,8 @@ The `user-management-ui` client must include the `systemUserId` user attribute a
 
 After saving, newly issued JWTs from this client will contain `"systemUserId": "<uuid>"` as a top-level claim.
 
+> **`capabilities` and `systemRoles` mappers are created automatically.** When `keycloak-manager` starts, its `RealmSetupService` registers realm-level `oidc-usermodel-attribute-mapper` entries for `capabilities` and `systemRoles` in Keycloak. These embed the user's assigned permissions directly into the JWT so downstream services no longer need a per-request call to ACM. You do not need to add these mappers manually — verify they were registered by checking `docker logs km` on first boot.
+
 ### 9.5 Register the Keycloak Manager Service Client
 
 The `keycloak-manager` service calls the Keycloak Admin REST API using the OAuth2 client credentials grant. You must register its service account client and grant it permission to manage users.
@@ -302,13 +305,15 @@ Then open `.env` and fill in the values:
 
 ```
 PORT=3000
-SESSION_SECRET=<generate a long random string>
+SESSION_SECRET=<generate with: openssl rand -base64 32>
 KEYCLOAK_BASE_URL=http://localhost:9000
 KEYCLOAK_REALM=system
 KEYCLOAK_CLIENT_ID=user-management-ui
 KEYCLOAK_CLIENT_SECRET=<paste the client secret from step 9.3>
 APP_BASE_URL=http://localhost:3000
 UMS_BASE_URL=http://localhost:8080
+ACM_BASE_URL=http://localhost:8130
+KM_BASE_URL=http://localhost:8210
 ```
 
 ### 9.8 Set the Keycloak login theme

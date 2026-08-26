@@ -14,8 +14,10 @@ import com.example.usermanagementservice.domain.enums.YesNo;
 import com.example.usermanagementservice.exception.ConflictException;
 import com.example.usermanagementservice.exception.NotFoundException;
 import com.example.usermanagementservice.mapper.UserMapper;
+import com.example.usermanagementservice.model.UserAuditRecord;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.repository.UserDetailsRepository;
+import com.example.usermanagementservice.repository.UserHistoryRepository;
 import com.example.usermanagementservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,7 @@ class UserServiceTest {
     @Mock private UserMapper userMapper;
     @Mock private KeycloakManagerClient keycloakManagerClient;
     @Mock private AcmClient acmClient;
+    @Mock private UserHistoryRepository userHistoryRepository;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -284,6 +287,34 @@ class UserServiceTest {
 
         assertNotNull(user.getLastLoginDate());
         verify(userRepository).save(user);
+    }
+
+    @Test
+    void getUserHistory_returnsRecordsFromRepository() {
+        List<UserAuditRecord> expected = List.of(
+                UserAuditRecord.builder()
+                        .validFrom(java.time.Instant.now())
+                        .lockedUserInd("NO")
+                        .activeInd("YES")
+                        .failedLoginAttempts(0)
+                        .build()
+        );
+
+        when(userHistoryRepository.findBySystemUserId(userId)).thenReturn(expected);
+
+        List<UserAuditRecord> result = userService.getUserHistory(userId);
+
+        assertEquals(expected, result);
+        verify(userHistoryRepository).findBySystemUserId(userId);
+    }
+
+    @Test
+    void getUserHistory_returnsEmptyListWhenNoHistory() {
+        when(userHistoryRepository.findBySystemUserId(userId)).thenReturn(List.of());
+
+        List<UserAuditRecord> result = userService.getUserHistory(userId);
+
+        assertTrue(result.isEmpty());
     }
 }
 
