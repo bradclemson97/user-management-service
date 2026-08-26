@@ -17,9 +17,11 @@ import com.example.usermanagementservice.domain.enums.YesNo;
 import com.example.usermanagementservice.exception.ConflictException;
 import com.example.usermanagementservice.exception.NotFoundException;
 import com.example.usermanagementservice.mapper.UserMapper;
+import com.example.usermanagementservice.model.UserAuditRecord;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
 import com.example.usermanagementservice.repository.UserDetailsRepository;
+import com.example.usermanagementservice.repository.UserHistoryRepository;
 import com.example.usermanagementservice.repository.UserRepository;
 import jakarta.persistence.criteria.Path;
 import jakarta.transaction.Transactional;
@@ -34,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.List;
 
 /**
  * Implementation of User Service.
@@ -48,6 +51,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final KeycloakManagerClient keycloakManagerClient;
     private final AcmClient acmClient;
+    private final UserHistoryRepository userHistoryRepository;
 
     private static final String KEYWORD_DELIMITER = " ";
 
@@ -261,5 +265,10 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         log.info("Deactivated user {}", systemUserId);
+    }
+
+    @Override
+    public List<UserAuditRecord> getUserHistory(UUID systemUserId) {
+        return userHistoryRepository.findBySystemUserId(systemUserId);
     }
 }

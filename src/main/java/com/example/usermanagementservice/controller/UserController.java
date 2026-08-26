@@ -6,6 +6,7 @@ import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
 import com.example.usermanagementservice.exception.response.ApiError;
+import com.example.usermanagementservice.model.UserAuditRecord;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import java.util.UUID;
 
@@ -175,5 +178,13 @@ public interface UserController {
             @Parameter(description = "Page size for pagination", example = "25")
             @RequestParam(name = "pageSize", required = false, defaultValue = "25")
             int size);
+
+    @RequiresCapability("Search and View users")
+    @Operation(summary = "Get user audit history", description = "Returns the full audit trail for a user from the history table")
+    @GetMapping("{systemUserId}" + API_HISTORY)
+    List<UserAuditRecord> getUserHistory(
+            @Parameter(example = "5dad5a08-73a2-5eds-2sdh-99fab505402a",
+                    description = "The user's unique reference")
+            @PathVariable UUID systemUserId);
 
 }

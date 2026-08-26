@@ -2,6 +2,7 @@
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/model/UserSoiDto.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/model/RoleDto.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/model/UserDetailsDto.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/filter/RequestMdcFilter.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/domain/enums/UserSearchSort.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/mapper/JpaAuditMapper.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/config/JpaConfig.java
@@ -16,11 +17,13 @@
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/controller/response/CreateUserResponse.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/response/KeycloakCreateUserResponse.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/UserManagementApplication.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/repository/UserHistoryRepository.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/scheduler/UserInactivityScheduler.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/model/AcmUserDto.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/client/request/AcmCreateUserRequest.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/exception/ConflictException.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/mapper/UserMapper.java
+/Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/model/UserAuditRecord.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/service/UserServiceImpl.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/controller/request/CreateUserRequest.java
 /Users/bradley.clemson/IdeaProjects/user-management-service/src/main/java/com/example/usermanagementservice/controller/request/UpdateUserRequest.java

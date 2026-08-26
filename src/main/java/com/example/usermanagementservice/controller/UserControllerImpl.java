@@ -4,6 +4,7 @@ import com.example.usermanagementservice.controller.request.CreateUserRequest;
 import com.example.usermanagementservice.controller.request.UpdateUserRequest;
 import com.example.usermanagementservice.controller.response.CreateUserResponse;
 import com.example.usermanagementservice.domain.enums.UserSearchSort;
+import com.example.usermanagementservice.model.UserAuditRecord;
 import com.example.usermanagementservice.model.UserDto;
 import com.example.usermanagementservice.model.UserSoiDto;
 import com.example.usermanagementservice.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -135,5 +137,13 @@ public class UserControllerImpl implements UserController {
         log.info("successfully searched for user with name {}, page {}, size {}, sort {}, direction {}",
                 name, page, size, sort, direction);
         return results;
+    }
+
+    @Override
+    public List<UserAuditRecord> getUserHistory(UUID systemUserId) {
+        log.info("Attempting to retrieve audit history for user {}", systemUserId);
+        List<UserAuditRecord> history = userService.getUserHistory(systemUserId);
+        log.info("Retrieved {} audit records for user {}", history.size(), systemUserId);
+        return history;
     }
 }
