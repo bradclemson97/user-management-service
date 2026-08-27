@@ -69,3 +69,9 @@ access-control:
   security:
     manager-url: ${ACM_URL:http://localhost:8130}
     system-user-id-claim: systemUserId
+
+springdoc:
+  swagger-ui:
+    path: /v1/docs
+  api-docs:
+    path: /v1/api-docs
